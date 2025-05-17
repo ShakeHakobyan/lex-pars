@@ -1,0 +1,7 @@
+a = 1;
+a-2;
+b = 5;
+c = a * b;
+
+if (1) print a;
+else print c;
