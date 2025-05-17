@@ -102,6 +102,29 @@ float minus_node::evaluate(){
 	return 0;
 }
 
+divided_node::divided_node(exp_node *L, exp_node *R) : operator_node(L, R) {
+}
+
+void divided_node::print(){
+	cout<<"(";
+	left->print();
+	cout<<"-";
+	right->print();
+	cout<<")";
+}
+
+float divided_node::evaluate(){
+	float left_num,right_num;
+
+	left_num = left->evaluate();
+	right_num = right->evaluate();
+
+	num = left_num / right_num;
+	cout<<"divided_node: "<<left_num<<"/"<<right_num<<"="<<num<<"\n";
+
+	return 0;
+}
+
 assignment_stmt::assignment_stmt(string name, exp_node *expression)
 	: id(name), exp(expression) {}
 
@@ -119,8 +142,33 @@ void assignment_stmt::evaluate() {
 
 print_stmt::print_stmt (string name) : id(name) { }
 
+void print_stmt::print() {
+	cout << "print " << id <<endl;
+}
+
 void print_stmt::evaluate() {
 	cout << "print_node: " << id << " = " << idTable[id] << endl << endl;
+}
+
+if_else_stmt::if_else_stmt(exp_node *expression, statement *statement_true, statement *statement_false)
+	:  exp(expression), stmt_true(statement_true), stmt_false(statement_false) {}
+
+void if_else_stmt::print() {
+	cout << "if ";
+	exp->print();
+	cout << "\n";
+	stmt_true->print();
+	cout << "else\n";
+	stmt_false->print();
+}
+
+void if_else_stmt::evaluate() {
+    if(exp->evaluate()) {
+		stmt_true->evaluate();
+	} else {
+		stmt_false->evaluate();
+    }
+	cout << "if else node" << endl << endl;
 }
 
 pgm::pgm(list<statement *> *stmtList) : stmts(stmtList) {}

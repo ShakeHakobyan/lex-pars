@@ -14,12 +14,6 @@ LETTER [a-zA-Z]
 
 %%
 
-"char"  { printf("<'char' , keyword>"); return CHAR; }
-
-"false"   { printf("<'false' , keyword>"); return FALSE; }
-
-"while"   { printf("<'while' , keyword>"); return WHILE; }
-
 "if"   { printf("<'if' , keyword>"); return IF; }
 
 "else"   { printf("<'else' , keyword>"); return ELSE; }
@@ -34,7 +28,13 @@ LETTER [a-zA-Z]
 
 "\n"    { printf("<'\\n' , NEWLINE>\n"); line_num++; return NEWLINE; }
 
+"+"	{ printf("<'+' , PLUS>\n"); return PLUS;  }
+
+"-"	{ printf("<'-' , MINUS>\n"); return MINUS;  }
+
 "*"	{ printf("<'*' , TIMES>\n"); return TIMES;  }
+
+"/"	{ printf("<'/' , DIVIDED>\n"); return DIVIDED;  }
 
 "="     { printf("<'=' , EQUALS>\n"); return EQUALS; }
 

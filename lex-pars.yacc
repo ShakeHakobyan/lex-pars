@@ -32,13 +32,14 @@ void yyerror(char * s);
 
 %token <num> NUMBER
 %token <id> ID
-%token <char> CHAR
-%token <false> FALSE
 %token <if> IF
 %token <else> ELSE
 %token <print> PRINT
-%token <while> WHILE
 %token NEWLINE
+%token PLUS
+%token MINUS
+%token TIMES
+%token DIVIDED
 %token <cmp> EQUALS 
 %token LPAREN RPAREN
 %token SEMICOLON
@@ -82,7 +83,11 @@ stmt: ID EQUALS exp SEMICOLON {
  }
 
 | IF LPAREN exp RPAREN stmt ELSE  stmt {
-   printf("Unsuppored if-else inst\n");
+   $$= new if_else_stmt($3, $5, $7);
+ }
+
+ | exp SEMICOLON {
+    $$ = new assignment_stmt("_", $1); printf("ova senc kod grum\n");
  }
 
 | stmt NEWLINE
@@ -92,9 +97,14 @@ stmt: ID EQUALS exp SEMICOLON {
 exp:	exp PLUS exp {
 	  $$ = new plus_node($1, $3); }
 
-	|	exp TIMES exp {
+	|  exp MINUS exp {
+      $$ = new minus_node($1, $3); }
+    |	exp TIMES exp {
 	  $$ = new times_node($1, $3); }
-	
+
+	|   exp DIVIDED exp {
+        $$ = new divided_node($1, $3); }
+
 	|	NUMBER {
 	  $$ = new number_node($1); }
 
@@ -104,10 +114,10 @@ exp:	exp PLUS exp {
 ;
  
 %%
-main()
+int main()
 {
   yyparse();
-  //root->evaluate();
+  root->evaluate();
   root->print();
 }
 

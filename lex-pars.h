@@ -91,7 +91,19 @@ class print_stmt: public statement {
 		string id;
 	public:
 		print_stmt(string id);
+		void print();
 		void evaluate();
+};
+
+class if_else_stmt : public statement {
+protected:
+	exp_node *exp;
+	statement *stmt_true;
+	statement *stmt_false;
+public:
+	if_else_stmt(exp_node *expression, statement *statement_true, statement *statement_false);
+	void print();
+	void evaluate();
 };
 
 class pgm {
