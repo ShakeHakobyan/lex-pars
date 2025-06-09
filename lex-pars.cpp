@@ -1,247 +1,237 @@
+#include "lex-pars.h"
 #include <iostream>
+#include <list>
+#include <map>
 #include <stdlib.h>
 #include <string>
-#include <map>
-#include <list>
-#include "lex-pars.h"
 
 using namespace std;
 
 operator_node::operator_node(exp_node *L, exp_node *R) {
-	left    = L;
-	right   = R;
+  left = L;
+  right = R;
 }
 
-number_node::number_node(float value) {
-	num = value;
-}
+number_node::number_node(float value) { num = value; }
 
-void number_node:: print() {
-	cout << num;
-}
+void number_node::print() { cout << num; }
 
-float number_node::evaluate() { 
-	cout << "number_node: operand = " << num << endl;
-	return num; }
+float number_node::evaluate() {
+  cout << "number_node: operand = " << num << endl;
+  return num;
+}
 
 id_node::id_node(string value) : id(value) {}
 
-void id_node:: print() {
-	cout << id;
+void id_node::print() { cout << id; }
+
+float id_node::evaluate() {
+  cout << "id_node: " << id << " = " << idTable[id] << endl;
+  return idTable[id];
 }
 
-float id_node::evaluate() { 
-	cout << "id_node: " << id << " = " << idTable[id] << endl;
-	return idTable[id]; 
-}
-
-plus_node::plus_node(exp_node *L, exp_node *R) : operator_node(L,R) {
-}
+plus_node::plus_node(exp_node *L, exp_node *R) : operator_node(L, R) {}
 
 void plus_node::print() {
-	cout << "(";
-	left->print();
-	cout << " + ";
-	right->print();
-	cout << ")";
+  cout << "(";
+  left->print();
+  cout << " + ";
+  right->print();
+  cout << ")";
 }
 
 float plus_node::evaluate() {
-	float left_num, right_num;
+  float left_num, right_num;
 
-	left_num  = left->evaluate();
-	right_num = right->evaluate();
+  left_num = left->evaluate();
+  right_num = right->evaluate();
 
-	num = left_num + right_num;
-	cout << "plus_node: " << left_num << " + " << right_num << " = " << num << "\n";
-	return (num);
+  num = left_num + right_num;
+  cout << "plus_node: " << left_num << " + " << right_num << " = " << num
+       << "\n";
+  return (num);
 }
 
-times_node::times_node(exp_node *L, exp_node *R) : operator_node(L,R) {
-}
+times_node::times_node(exp_node *L, exp_node *R) : operator_node(L, R) {}
 
-void times_node:: print() {
-	cout << "(";
-	left->print();
-	cout << " * ";
-	right->print();
-	cout << ")";
+void times_node::print() {
+  cout << "(";
+  left->print();
+  cout << " * ";
+  right->print();
+  cout << ")";
 }
 
 float times_node::evaluate() {
-	float left_num, right_num;
+  float left_num, right_num;
 
-	left_num = left->evaluate();
-	right_num = right->evaluate();
+  left_num = left->evaluate();
+  right_num = right->evaluate();
 
-	num = left_num * right_num;
-	cout << "times_node: " << left_num << " * " << right_num << " = " << num << "\n";
-	return (num);
+  num = left_num * right_num;
+  cout << "times_node: " << left_num << " * " << right_num << " = " << num
+       << "\n";
+  return (num);
 }
 
-minus_node::minus_node(exp_node *L, exp_node *R) : operator_node(L, R) {
+minus_node::minus_node(exp_node *L, exp_node *R) : operator_node(L, R) {}
+
+void minus_node::print() {
+  cout << "(";
+  left->print();
+  cout << "-";
+  right->print();
+  cout << ")";
 }
 
-void minus_node::print(){
-	cout<<"(";
-	left->print();
-	cout<<"-";
-	right->print();
-	cout<<")";
+float minus_node::evaluate() {
+  float left_num, right_num;
+
+  left_num = left->evaluate();
+  right_num = right->evaluate();
+
+  num = left_num - right_num;
+  cout << "minus_node: " << left_num << "-" << right_num << "=" << num << "\n";
+
+  return num;
 }
 
-float minus_node::evaluate(){
-	float left_num,right_num;
+divided_node::divided_node(exp_node *L, exp_node *R) : operator_node(L, R) {}
 
-	left_num = left->evaluate();
-	right_num = right->evaluate();
-
-	num = left_num - right_num;
-	cout<<"minus_node: "<<left_num<<"-"<<right_num<<"="<<num<<"\n";
-
-	return num;
+void divided_node::print() {
+  cout << "(";
+  left->print();
+  cout << "-";
+  right->print();
+  cout << ")";
 }
 
-divided_node::divided_node(exp_node *L, exp_node *R) : operator_node(L, R) {
-}
+float divided_node::evaluate() {
+  float left_num, right_num;
 
-void divided_node::print(){
-	cout<<"(";
-	left->print();
-	cout<<"-";
-	right->print();
-	cout<<")";
-}
+  left_num = left->evaluate();
+  right_num = right->evaluate();
 
-float divided_node::evaluate(){
-	float left_num,right_num;
+  num = left_num / right_num;
+  cout << "divided_node: " << left_num << "/" << right_num << "=" << num
+       << "\n";
 
-	left_num = left->evaluate();
-	right_num = right->evaluate();
-
-	num = left_num / right_num;
-	cout<<"divided_node: "<<left_num<<"/"<<right_num<<"="<<num<<"\n";
-
-	return num;
+  return num;
 }
 
 assignment_stmt::assignment_stmt(string name, exp_node *expression)
-	: id(name), exp(expression) {}
+    : id(name), exp(expression) {}
 
-	void assignment_stmt::print() {
-		cout << id << " = ";
-		exp->print();
-		cout << endl;
-	}
+void assignment_stmt::print() {
+  cout << id << " = ";
+  exp->print();
+  cout << endl;
+}
 
 void assignment_stmt::evaluate() {
-	float result = exp->evaluate();
-	cout << "assignment_node: " << id << " = " << result << endl << endl;
-	idTable[id] = result;
+  float result = exp->evaluate();
+  cout << "assignment_node: " << id << " = " << result << endl << endl;
+  idTable[id] = result;
 }
 
-print_stmt::print_stmt (string name) : id(name) { }
+print_stmt::print_stmt(string name) : id(name) {}
 
-void print_stmt::print() {
-	cout << "print " << id <<endl;
-}
+void print_stmt::print() { cout << "print " << id << endl; }
 
 void print_stmt::evaluate() {
-	cout << "print_node: " << id << " = " << idTable[id] << endl << endl;
+  cout << "print_node: " << id << " = " << idTable[id] << endl << endl;
 }
 
-if_else_stmt::if_else_stmt(exp_node *expression, statement *statement_true, statement *statement_false)
-	:  exp(expression), stmt_true(statement_true), stmt_false(statement_false) {}
+if_else_stmt::if_else_stmt(exp_node *expression, statement *statement_true,
+                           statement *statement_false)
+    : exp(expression), stmt_true(statement_true), stmt_false(statement_false) {}
 
 void if_else_stmt::print() {
-	cout << "if ";
-	exp->print();
-	cout << "\n";
-	stmt_true->print();
-	cout << "else\n";
-	stmt_false->print();
+  cout << "if ";
+  exp->print();
+  cout << "\n";
+  stmt_true->print();
+  cout << "else\n";
+  stmt_false->print();
 }
 
 void if_else_stmt::evaluate() {
-    if(exp->evaluate()) {
-		stmt_true->evaluate();
-	} else {
-		stmt_false->evaluate();
-    }
-	cout << "if else node" << endl << endl;
+  if (exp->evaluate()) {
+    stmt_true->evaluate();
+  } else {
+    stmt_false->evaluate();
+  }
+  cout << "if else node" << endl << endl;
 }
 
 while_stmt::while_stmt(exp_node *expression, statement *statement)
-	:  exp(expression), stmt(statement) {}
+    : exp(expression), stmt(statement) {}
 
 void while_stmt::print() {
-	cout << "while (";
-	exp->print();
-	cout << " )\n";
-	stmt->print();
+  cout << "while (";
+  exp->print();
+  cout << " )\n";
+  stmt->print();
 }
 
 void while_stmt::evaluate() {
-	while(exp->evaluate()) {
-		stmt->evaluate();
-	}
-	cout << "while node" << endl << endl;
+  while (exp->evaluate()) {
+    stmt->evaluate();
+  }
+  cout << "while node" << endl << endl;
 }
 
-for_stmt::for_stmt(statement *initial, statement *step, exp_node *condition, statement *statement)
-	:  init(initial), step(step), cond(condition), stmt(statement) {}
+for_stmt::for_stmt(statement *initial, statement *step, exp_node *condition,
+                   statement *statement)
+    : init(initial), step(step), cond(condition), stmt(statement) {}
 
 void for_stmt::print() {
-	cout << "for (\n    init: ";
-	init->print();
-	cout << "    step: ";
-	step->print();
-	cout << "    cond: ";
-	cond->print();
-	cout << ")";
-	stmt->print();
+  cout << "for (\n    init: ";
+  init->print();
+  cout << "    step: ";
+  step->print();
+  cout << "    cond: ";
+  cond->print();
+  cout << ")";
+  stmt->print();
 }
 
 void for_stmt::evaluate() {
-	init->evaluate();
-	while(cond->evaluate()) {
-		stmt->evaluate();
-		step->evaluate();
-	}
-	cout << "for node" << endl << endl;
+  init->evaluate();
+  while (cond->evaluate()) {
+    stmt->evaluate();
+    step->evaluate();
+  }
+  cout << "for node" << endl << endl;
 }
 
 stmtlist::stmtlist(list<statement *> *stmtList) : stmts(stmtList) {}
 
 void stmtlist::evaluate() {
-	list<statement *>::iterator stmtIter;
-	for (stmtIter = stmts->begin(); stmtIter != stmts->end();
-			stmtIter++) {
-		(*stmtIter)->print();
-		(*stmtIter)->evaluate();
-	}
+  list<statement *>::iterator stmtIter;
+  for (stmtIter = stmts->begin(); stmtIter != stmts->end(); stmtIter++) {
+    (*stmtIter)->print();
+    (*stmtIter)->evaluate();
+  }
 }
 
 void stmtlist::print() {
-	list<statement *>::iterator stmtIter;
-        cout<<"\n[\n";
-        for (stmtIter = stmts->begin(); stmtIter != stmts->end();
-                        stmtIter++) {
-   				(*stmtIter)->print();
-	}
-        cout<<"] \n";
+  list<statement *>::iterator stmtIter;
+  cout << "\n[\n";
+  for (stmtIter = stmts->begin(); stmtIter != stmts->end(); stmtIter++) {
+    (*stmtIter)->print();
+  }
+  cout << "] \n";
 }
 
 pgm::pgm(list<statement *> *stmtList) : stmts(new stmtlist(stmtList)) {}
 
-void pgm::evaluate() {
-	stmts->evaluate();
-}
+void pgm::evaluate() { stmts->evaluate(); }
 
 void pgm::print() {
-        cout<<"\nGoing to print AST\n"; 
-        stmts->print();
-        cout<<"\nAST printed \n";
+  cout << "\nGoing to print AST\n";
+  stmts->print();
+  cout << "\nAST printed \n";
 }
 
 map<string, float> idTable;
