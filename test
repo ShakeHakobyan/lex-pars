@@ -1,7 +1,11 @@
-a = 1;
+a = 5;
 a-2;
-b = 5;
+b = 6;
 c = a * b;
 
 if (1) print a;
 else print c;
+
+while(a) a = a - 1;
+
+for(i = 0; i=i+1; i - b) [print i; b = b - 1;]

@@ -99,7 +99,7 @@ float minus_node::evaluate(){
 	num = left_num - right_num;
 	cout<<"minus_node: "<<left_num<<"-"<<right_num<<"="<<num<<"\n";
 
-	return 0;
+	return num;
 }
 
 divided_node::divided_node(exp_node *L, exp_node *R) : operator_node(L, R) {
@@ -122,7 +122,7 @@ float divided_node::evaluate(){
 	num = left_num / right_num;
 	cout<<"divided_node: "<<left_num<<"/"<<right_num<<"="<<num<<"\n";
 
-	return 0;
+	return num;
 }
 
 assignment_stmt::assignment_stmt(string name, exp_node *expression)
@@ -171,9 +171,49 @@ void if_else_stmt::evaluate() {
 	cout << "if else node" << endl << endl;
 }
 
-pgm::pgm(list<statement *> *stmtList) : stmts(stmtList) {}
+while_stmt::while_stmt(exp_node *expression, statement *statement)
+	:  exp(expression), stmt(statement) {}
 
-void pgm::evaluate() {
+void while_stmt::print() {
+	cout << "while (";
+	exp->print();
+	cout << " )\n";
+	stmt->print();
+}
+
+void while_stmt::evaluate() {
+	while(exp->evaluate()) {
+		stmt->evaluate();
+	}
+	cout << "while node" << endl << endl;
+}
+
+for_stmt::for_stmt(statement *initial, statement *step, exp_node *condition, statement *statement)
+	:  init(initial), step(step), cond(condition), stmt(statement) {}
+
+void for_stmt::print() {
+	cout << "for (\n    init: ";
+	init->print();
+	cout << "    step: ";
+	step->print();
+	cout << "    cond: ";
+	cond->print();
+	cout << ")";
+	stmt->print();
+}
+
+void for_stmt::evaluate() {
+	init->evaluate();
+	while(cond->evaluate()) {
+		stmt->evaluate();
+		step->evaluate();
+	}
+	cout << "for node" << endl << endl;
+}
+
+stmtlist::stmtlist(list<statement *> *stmtList) : stmts(stmtList) {}
+
+void stmtlist::evaluate() {
 	list<statement *>::iterator stmtIter;
 	for (stmtIter = stmts->begin(); stmtIter != stmts->end();
 			stmtIter++) {
@@ -182,13 +222,25 @@ void pgm::evaluate() {
 	}
 }
 
-void pgm::print() {
+void stmtlist::print() {
 	list<statement *>::iterator stmtIter;
-        cout<<"\nGoing to print AST\n"; 
+        cout<<"\n[\n";
         for (stmtIter = stmts->begin(); stmtIter != stmts->end();
                         stmtIter++) {
-                (*stmtIter)->print();
+   				(*stmtIter)->print();
 	}
+        cout<<"] \n";
+}
+
+pgm::pgm(list<statement *> *stmtList) : stmts(new stmtlist(stmtList)) {}
+
+void pgm::evaluate() {
+	stmts->evaluate();
+}
+
+void pgm::print() {
+        cout<<"\nGoing to print AST\n"; 
+        stmts->print();
         cout<<"\nAST printed \n";
 }
 

@@ -106,13 +106,45 @@ public:
 	void evaluate();
 };
 
+class while_stmt : public statement {
+protected:
+	exp_node *exp;
+	statement *stmt;
+public:
+	while_stmt(exp_node *expression, statement *statement);
+	void print();
+	void evaluate();
+};
+
+class for_stmt : public statement {
+protected:
+	statement *init;
+	statement *step;
+	exp_node *cond;
+	statement *stmt;
+public:
+	for_stmt(statement *initial, statement *step, exp_node *condition, statement *statement);
+	void print();
+	void evaluate();
+};
+
+
+class stmtlist : public statement {
+protected:
+	list<statement *> *stmts;
+public:
+	stmtlist(list<statement *> *stmtlist);
+	void evaluate();
+	void print();
+};
+
 class pgm {
-	protected:
-		list<statement *> *stmts;
-	public:
-		pgm(list<statement *> *stmtlist);
-		void evaluate();
-                void print();
+protected:
+	stmtlist *stmts;
+public:
+	pgm(list<statement *> *stmtlist);
+	void evaluate();
+	void print();
 };
 
 extern map<string, float> idTable;

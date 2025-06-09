@@ -34,6 +34,8 @@ void yyerror(char * s);
 %token <id> ID
 %token <if> IF
 %token <else> ELSE
+%token <while> WHILE
+%token <while> FOR
 %token <print> PRINT
 %token NEWLINE
 %token PLUS
@@ -42,6 +44,7 @@ void yyerror(char * s);
 %token DIVIDED
 %token <cmp> EQUALS 
 %token LPAREN RPAREN
+%token LBRACKET RBRACKET
 %token SEMICOLON
 
 %type <expnode> exp 
@@ -86,6 +89,17 @@ stmt: ID EQUALS exp SEMICOLON {
    $$= new if_else_stmt($3, $5, $7);
  }
 
+| WHILE LPAREN exp RPAREN stmt {
+   $$= new while_stmt($3, $5);
+ }
+
+ | FOR LPAREN stmt stmt exp RPAREN stmt {
+    $$= new for_stmt($3, $4, $5, $7);
+  }
+  | LBRACKET stmtlist RBRACKET {
+    $$ = new stmtlist($2);
+  }
+
  | exp SEMICOLON {
     $$ = new assignment_stmt("_", $1); printf("ova senc kod grum\n");
  }
@@ -110,6 +124,10 @@ exp:	exp PLUS exp {
 
 	|       ID {
   	  $$ = new id_node($1); }
+
+  	|  LPAREN exp RPAREN {
+        $$ = $2;
+     }
 
 ;
  

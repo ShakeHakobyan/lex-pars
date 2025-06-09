@@ -18,6 +18,10 @@ LETTER [a-zA-Z]
 
 "else"   { printf("<'else' , keyword>"); return ELSE; }
 
+"while"  { printf("<'while' , keyword>"); return WHILE; }
+
+"for"  { printf("<'for' , keyword>"); return FOR; }
+
 "print"   { printf("<'print' , keyword>"); return PRINT; }
 
 {DIGIT}+  { printf("<num, NUMBER>\n"); yylval.num = atof(yytext); return NUMBER; }
@@ -43,6 +47,10 @@ LETTER [a-zA-Z]
 "("     { printf("<'(' , LPAREN>\n"); return LPAREN; }
 
 ")"     { printf("<')' , RPAREN>\n"); return RPAREN; }
+
+"["     { printf("<'<' , LBRACKET>\n"); return LBRACKET; }
+
+"]"     { printf("<'>' , RBRACKET>\n"); return RBRACKET; }
 
 . { printf("error token: %s on line %d\n", yytext, line_num); yymore(); }
 
