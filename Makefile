@@ -12,7 +12,7 @@ YFLAGS= -d -t -y
 RM = /bin/rm -f
 
 run: lex-pars
-	./lex-pars < test
+	./lex-pars < test && clang output.ll && ./a.out
 
 lex-pars: y.tab.o lex.yy.o lex-pars.o
 	${CCC} ${CCFLAGS} lex.yy.o y.tab.o lex-pars.o -o lex-pars ${LLVM_LDFLAGS}

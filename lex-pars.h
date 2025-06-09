@@ -1,16 +1,36 @@
+#ifndef LEX_PARS_H
+#define LEX_PARS_H
+
 #include <iostream>
 #include <list>
 #include <map>
+#include <memory>
 #include <stdlib.h>
 #include <string>
 
+#include "llvm/IR/Function.h"
+#include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Verifier.h"
+#include "llvm/Support/FileSystem.h"
+#include "llvm/Support/raw_ostream.h"
+
 using namespace std;
+using namespace llvm;
+
+extern LLVMContext TheContext;
+extern IRBuilder<> Builder;
+extern unique_ptr<Module> TheModule;
+extern map<string, Value *> NamedValues;
 
 class exp_node {
 public:
   int num;
   virtual void print() = 0;
   virtual int evaluate() = 0;
+  virtual Value *codegen() = 0;
 };
 
 class operator_node : public exp_node {
@@ -21,11 +41,11 @@ public:
 };
 
 class number_node : public exp_node {
-
 public:
   number_node(int value);
-  void print();
-  int evaluate();
+  void print() override;
+  int evaluate() override;
+  Value *codegen() override;
 };
 
 class id_node : public exp_node {
@@ -34,42 +54,48 @@ protected:
 
 public:
   id_node(string value);
-  void print();
-  int evaluate();
+  void print() override;
+  int evaluate() override;
+  Value *codegen() override;
 };
 
 class plus_node : public operator_node {
 public:
   plus_node(exp_node *L, exp_node *R);
-  void print();
-  int evaluate();
+  void print() override;
+  int evaluate() override;
+  Value *codegen() override;
 };
 
 class times_node : public operator_node {
 public:
   times_node(exp_node *L, exp_node *R);
-  void print();
-  int evaluate();
+  void print() override;
+  int evaluate() override;
+  Value *codegen() override;
 };
 
 class minus_node : public operator_node {
 public:
   minus_node(exp_node *L, exp_node *R);
-  void print();
-  int evaluate();
+  void print() override;
+  int evaluate() override;
+  Value *codegen() override;
 };
 
 class divided_node : public operator_node {
 public:
   divided_node(exp_node *L, exp_node *R);
-  void print();
-  int evaluate();
+  void print() override;
+  int evaluate() override;
+  Value *codegen() override;
 };
 
 class statement {
 public:
   virtual void print() {}
   virtual void evaluate() = 0;
+  virtual void codegen() = 0;
 };
 
 class assignment_stmt : public statement {
@@ -79,8 +105,9 @@ protected:
 
 public:
   assignment_stmt(string name, exp_node *expression);
-  void print();
-  void evaluate();
+  void print() override;
+  void evaluate() override;
+  void codegen() override;
 };
 
 class print_stmt : public statement {
@@ -89,8 +116,9 @@ protected:
 
 public:
   print_stmt(string id);
-  void print();
-  void evaluate();
+  void print() override;
+  void evaluate() override;
+  void codegen() override;
 };
 
 class if_else_stmt : public statement {
@@ -102,8 +130,9 @@ protected:
 public:
   if_else_stmt(exp_node *expression, statement *statement_true,
                statement *statement_false);
-  void print();
-  void evaluate();
+  void print() override;
+  void evaluate() override;
+  void codegen() override;
 };
 
 class while_stmt : public statement {
@@ -113,8 +142,9 @@ protected:
 
 public:
   while_stmt(exp_node *expression, statement *statement);
-  void print();
-  void evaluate();
+  void print() override;
+  void evaluate() override;
+  void codegen() override;
 };
 
 class for_stmt : public statement {
@@ -127,8 +157,9 @@ protected:
 public:
   for_stmt(statement *initial, statement *step, exp_node *condition,
            statement *statement);
-  void print();
-  void evaluate();
+  void print() override;
+  void evaluate() override;
+  void codegen() override;
 };
 
 class stmtlist : public statement {
@@ -137,8 +168,9 @@ protected:
 
 public:
   stmtlist(list<statement *> *stmtlist);
-  void evaluate();
-  void print();
+  void evaluate() override;
+  void print() override;
+  void codegen() override;
 };
 
 class pgm {
@@ -149,7 +181,10 @@ public:
   pgm(list<statement *> *stmtlist);
   void evaluate();
   void print();
+  void codegen();
 };
 
 extern map<string, int> idTable;
 extern pgm *root;
+
+#endif // LEX_PARS_H

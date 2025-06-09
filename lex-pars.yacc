@@ -137,6 +137,7 @@ int main()
   yyparse();
   root->evaluate();
   root->print();
+  root->codegen();
 }
 
 void yyerror(char * s)
