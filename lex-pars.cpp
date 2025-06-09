@@ -12,11 +12,11 @@ operator_node::operator_node(exp_node *L, exp_node *R) {
   right = R;
 }
 
-number_node::number_node(float value) { num = value; }
+number_node::number_node(int value) { num = value; }
 
 void number_node::print() { cout << num; }
 
-float number_node::evaluate() {
+int number_node::evaluate() {
   cout << "number_node: operand = " << num << endl;
   return num;
 }
@@ -25,7 +25,7 @@ id_node::id_node(string value) : id(value) {}
 
 void id_node::print() { cout << id; }
 
-float id_node::evaluate() {
+int id_node::evaluate() {
   cout << "id_node: " << id << " = " << idTable[id] << endl;
   return idTable[id];
 }
@@ -40,8 +40,8 @@ void plus_node::print() {
   cout << ")";
 }
 
-float plus_node::evaluate() {
-  float left_num, right_num;
+int plus_node::evaluate() {
+  int left_num, right_num;
 
   left_num = left->evaluate();
   right_num = right->evaluate();
@@ -62,8 +62,8 @@ void times_node::print() {
   cout << ")";
 }
 
-float times_node::evaluate() {
-  float left_num, right_num;
+int times_node::evaluate() {
+  int left_num, right_num;
 
   left_num = left->evaluate();
   right_num = right->evaluate();
@@ -84,8 +84,8 @@ void minus_node::print() {
   cout << ")";
 }
 
-float minus_node::evaluate() {
-  float left_num, right_num;
+int minus_node::evaluate() {
+  int left_num, right_num;
 
   left_num = left->evaluate();
   right_num = right->evaluate();
@@ -106,8 +106,8 @@ void divided_node::print() {
   cout << ")";
 }
 
-float divided_node::evaluate() {
-  float left_num, right_num;
+int divided_node::evaluate() {
+  int left_num, right_num;
 
   left_num = left->evaluate();
   right_num = right->evaluate();
@@ -129,7 +129,7 @@ void assignment_stmt::print() {
 }
 
 void assignment_stmt::evaluate() {
-  float result = exp->evaluate();
+  int result = exp->evaluate();
   cout << "assignment_node: " << id << " = " << result << endl << endl;
   idTable[id] = result;
 }
@@ -234,4 +234,4 @@ void pgm::print() {
   cout << "\nAST printed \n";
 }
 
-map<string, float> idTable;
+map<string, int> idTable;

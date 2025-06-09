@@ -20,7 +20,7 @@ void yyerror(char * s);
 %start program
 
 %union {
-  float num;
+  int num;
   char *id;
   exp_node *expnode;
   list<statement *> *stmts;

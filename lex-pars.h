@@ -8,9 +8,9 @@ using namespace std;
 
 class exp_node {
 public:
-  float num;
+  int num;
   virtual void print() = 0;
-  virtual float evaluate() = 0;
+  virtual int evaluate() = 0;
 };
 
 class operator_node : public exp_node {
@@ -23,9 +23,9 @@ public:
 class number_node : public exp_node {
 
 public:
-  number_node(float value);
+  number_node(int value);
   void print();
-  float evaluate();
+  int evaluate();
 };
 
 class id_node : public exp_node {
@@ -35,35 +35,35 @@ protected:
 public:
   id_node(string value);
   void print();
-  float evaluate();
+  int evaluate();
 };
 
 class plus_node : public operator_node {
 public:
   plus_node(exp_node *L, exp_node *R);
   void print();
-  float evaluate();
+  int evaluate();
 };
 
 class times_node : public operator_node {
 public:
   times_node(exp_node *L, exp_node *R);
   void print();
-  float evaluate();
+  int evaluate();
 };
 
 class minus_node : public operator_node {
 public:
   minus_node(exp_node *L, exp_node *R);
   void print();
-  float evaluate();
+  int evaluate();
 };
 
 class divided_node : public operator_node {
 public:
   divided_node(exp_node *L, exp_node *R);
   void print();
-  float evaluate();
+  int evaluate();
 };
 
 class statement {
@@ -151,5 +151,5 @@ public:
   void print();
 };
 
-extern map<string, float> idTable;
+extern map<string, int> idTable;
 extern pgm *root;
