@@ -27,7 +27,7 @@ int number_node::evaluate() {
   return num;
 }
 
-llvm::Value *number_node::codegen() {
+Value *number_node::codegen() {
   return ConstantInt::get(Type::getInt32Ty(TheContext), num, true);
 }
 
@@ -40,8 +40,8 @@ int id_node::evaluate() {
   return idTable[id];
 }
 
-llvm::Value *id_node::codegen() {
-  llvm::Value *V = NamedValues[id];
+Value *id_node::codegen() {
+  Value *V = NamedValues[id];
   return Builder.CreateLoad(Type::getInt32Ty(TheContext), V, id.c_str());
 }
 
@@ -55,9 +55,9 @@ void plus_node::print() {
   cout << ")";
 }
 
-llvm::Value *plus_node::codegen() {
-  llvm::Value *L = left->codegen();
-  llvm::Value *R = right->codegen();
+Value *plus_node::codegen() {
+  Value *L = left->codegen();
+  Value *R = right->codegen();
   if (!L || !R)
     return nullptr;
   return Builder.CreateAdd(L, R, "addtmp");
@@ -97,9 +97,9 @@ int times_node::evaluate() {
   return (num);
 }
 
-llvm::Value *times_node::codegen() {
-  llvm::Value *L = left->codegen();
-  llvm::Value *R = right->codegen();
+Value *times_node::codegen() {
+  Value *L = left->codegen();
+  Value *R = right->codegen();
   if (!L || !R)
     return nullptr;
   return Builder.CreateMul(L, R, "multmp");
@@ -127,9 +127,9 @@ int minus_node::evaluate() {
   return num;
 }
 
-llvm::Value *minus_node::codegen() {
-  llvm::Value *L = left->codegen();
-  llvm::Value *R = right->codegen();
+Value *minus_node::codegen() {
+  Value *L = left->codegen();
+  Value *R = right->codegen();
   if (!L || !R)
     return nullptr;
   return Builder.CreateSub(L, R, "subtmp");
@@ -158,9 +158,9 @@ int divided_node::evaluate() {
   return num;
 }
 
-llvm::Value *divided_node::codegen() {
-  llvm::Value *L = left->codegen();
-  llvm::Value *R = right->codegen();
+Value *divided_node::codegen() {
+  Value *L = left->codegen();
+  Value *R = right->codegen();
   if (!L || !R)
     return nullptr;
   return Builder.CreateSDiv(L, R, "divtmp");
@@ -182,11 +182,11 @@ void assignment_stmt::evaluate() {
 }
 
 void assignment_stmt::codegen() {
-  llvm::Value *Val = exp->codegen();
+  Value *Val = exp->codegen();
   if (!Val)
     return;
 
-  llvm::Value *Variable = NamedValues[id];
+  Value *Variable = NamedValues[id];
   if (!Variable) {
     Function *TheFunction = Builder.GetInsertBlock()->getParent();
     IRBuilder<> TmpB(&TheFunction->getEntryBlock(),
@@ -206,17 +206,15 @@ void print_stmt::evaluate() {
   cout << "print_node: " << id << " = " << idTable[id] << endl << endl;
 }
 
-llvm::FunctionCallee printfFunc = TheModule->getOrInsertFunction(
+FunctionCallee printfFunc = TheModule->getOrInsertFunction(
     "printf",
-    llvm::FunctionType::get(
-        llvm::IntegerType::getInt32Ty(TheContext),
-        llvm::PointerType::get(llvm::Type::getInt8Ty(TheContext), 0), true));
+    FunctionType::get(IntegerType::getInt32Ty(TheContext),
+                      PointerType::get(Type::getInt8Ty(TheContext), 0), true));
 
 void print_stmt::codegen() {
-  llvm::Value *val = NamedValues[id];
-  llvm::Value *load =
-      Builder.CreateLoad(llvm::Type::getInt32Ty(TheContext), val, id);
-  llvm::Value *formatStr = Builder.CreateGlobalStringPtr("%d\n");
+  Value *val = NamedValues[id];
+  Value *load = Builder.CreateLoad(Type::getInt32Ty(TheContext), val, id);
+  Value *formatStr = Builder.CreateGlobalStringPtr("%d\n");
   Builder.CreateCall(printfFunc, {formatStr, load});
 }
 
@@ -243,23 +241,18 @@ void if_else_stmt::evaluate() {
 }
 
 void if_else_stmt::codegen() {
-  llvm::Value *CondV = exp->codegen();
+  Value *CondV = exp->codegen();
   if (!CondV)
     return;
 
   CondV = Builder.CreateICmpNE(
-      CondV,
-      llvm::ConstantInt::get(llvm::Type::getInt32Ty(TheContext), 0, true),
-      "ifcond");
+      CondV, ConstantInt::get(Type::getInt32Ty(TheContext), 0, true), "ifcond");
 
-  llvm::Function *TheFunction = Builder.GetInsertBlock()->getParent();
+  Function *TheFunction = Builder.GetInsertBlock()->getParent();
 
-  llvm::BasicBlock *ThenBB =
-      llvm::BasicBlock::Create(TheContext, "then", TheFunction);
-  llvm::BasicBlock *ElseBB =
-      llvm::BasicBlock::Create(TheContext, "else", TheFunction);
-  llvm::BasicBlock *MergeBB =
-      llvm::BasicBlock::Create(TheContext, "ifcont", TheFunction);
+  BasicBlock *ThenBB = BasicBlock::Create(TheContext, "then", TheFunction);
+  BasicBlock *ElseBB = BasicBlock::Create(TheContext, "else", TheFunction);
+  BasicBlock *MergeBB = BasicBlock::Create(TheContext, "ifcont", TheFunction);
 
   Builder.CreateCondBr(CondV, ThenBB, ElseBB);
 
@@ -292,24 +285,21 @@ void while_stmt::evaluate() {
 }
 
 void while_stmt::codegen() {
-  llvm::Function *TheFunction = Builder.GetInsertBlock()->getParent();
+  Function *TheFunction = Builder.GetInsertBlock()->getParent();
 
-  llvm::BasicBlock *CondBB =
-      llvm::BasicBlock::Create(TheContext, "whilecond", TheFunction);
-  llvm::BasicBlock *LoopBB =
-      llvm::BasicBlock::Create(TheContext, "whileloop", TheFunction);
-  llvm::BasicBlock *AfterBB =
-      llvm::BasicBlock::Create(TheContext, "afterloop", TheFunction);
+  BasicBlock *CondBB = BasicBlock::Create(TheContext, "whilecond", TheFunction);
+  BasicBlock *LoopBB = BasicBlock::Create(TheContext, "whileloop", TheFunction);
+  BasicBlock *AfterBB =
+      BasicBlock::Create(TheContext, "afterloop", TheFunction);
 
   Builder.CreateBr(CondBB);
 
   Builder.SetInsertPoint(CondBB);
-  llvm::Value *CondV = exp->codegen();
+  Value *CondV = exp->codegen();
   if (!CondV)
     return;
   CondV = Builder.CreateICmpNE(
-      CondV,
-      llvm::ConstantInt::get(llvm::Type::getInt32Ty(TheContext), 0, true),
+      CondV, ConstantInt::get(Type::getInt32Ty(TheContext), 0, true),
       "whilecond");
 
   Builder.CreateCondBr(CondV, LoopBB, AfterBB);
@@ -347,29 +337,25 @@ void for_stmt::evaluate() {
 }
 
 void for_stmt::codegen() {
-  llvm::Function *TheFunction = Builder.GetInsertBlock()->getParent();
+  Function *TheFunction = Builder.GetInsertBlock()->getParent();
 
   if (init)
     init->codegen();
 
-  llvm::BasicBlock *CondBB =
-      llvm::BasicBlock::Create(TheContext, "forcond", TheFunction);
-  llvm::BasicBlock *LoopBB =
-      llvm::BasicBlock::Create(TheContext, "forloop", TheFunction);
-  llvm::BasicBlock *AfterBB =
-      llvm::BasicBlock::Create(TheContext, "afterfor", TheFunction);
+  BasicBlock *CondBB = BasicBlock::Create(TheContext, "forcond", TheFunction);
+  BasicBlock *LoopBB = BasicBlock::Create(TheContext, "forloop", TheFunction);
+  BasicBlock *AfterBB = BasicBlock::Create(TheContext, "afterfor", TheFunction);
 
   Builder.CreateBr(CondBB);
 
   Builder.SetInsertPoint(CondBB);
 
-  llvm::Value *CondV = cond->codegen();
+  Value *CondV = cond->codegen();
   if (!CondV)
     return;
 
   CondV = Builder.CreateICmpNE(
-      CondV,
-      llvm::ConstantInt::get(llvm::Type::getInt32Ty(TheContext), 0, true),
+      CondV, ConstantInt::get(Type::getInt32Ty(TheContext), 0, true),
       "forcond");
 
   Builder.CreateCondBr(CondV, LoopBB, AfterBB);
@@ -432,10 +418,10 @@ void pgm::codegen() {
 
   Builder.CreateRet(ConstantInt::get(Type::getInt32Ty(TheContext), 0));
 
-  std::error_code EC;
-  llvm::raw_fd_ostream dest("output.ll", EC, llvm::sys::fs::OF_None);
+  error_code EC;
+  raw_fd_ostream dest("output.ll", EC, sys::fs::OF_None);
   if (EC) {
-    llvm::errs() << "Could not open file: " << EC.message() << "\n";
+    errs() << "Could not open file: " << EC.message() << "\n";
     return;
   }
   TheModule->print(dest, nullptr);
