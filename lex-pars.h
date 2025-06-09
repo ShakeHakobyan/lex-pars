@@ -135,6 +135,39 @@ public:
   void codegen() override;
 };
 
+class gt_zero_node : public exp_node {
+protected:
+  exp_node *expr;
+
+public:
+  gt_zero_node(exp_node *e);
+  void print() override;
+  int evaluate() override;
+  Value *codegen() override;
+};
+
+class lt_zero_node : public exp_node {
+protected:
+  exp_node *expr;
+
+public:
+  lt_zero_node(exp_node *e);
+  void print() override;
+  int evaluate() override;
+  Value *codegen() override;
+};
+
+class eq_zero_node : public exp_node {
+protected:
+  exp_node *expr;
+
+public:
+  eq_zero_node(exp_node *e);
+  void print() override;
+  int evaluate() override;
+  Value *codegen() override;
+};
+
 class while_stmt : public statement {
 protected:
   exp_node *exp;
