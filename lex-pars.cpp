@@ -194,11 +194,11 @@ for_stmt::for_stmt(statement *initial, statement *step, exp_node *condition, sta
 void for_stmt::print() {
 	cout << "for (\n    init: ";
 	init->print();
-	cout << "\n    step: ";
+	cout << "    step: ";
 	step->print();
-	cout << "\n    cond: ";
+	cout << "    cond: ";
 	cond->print();
-	cout << ") \n";
+	cout << ")";
 	stmt->print();
 }
 
@@ -211,9 +211,9 @@ void for_stmt::evaluate() {
 	cout << "for node" << endl << endl;
 }
 
-pgm::pgm(list<statement *> *stmtList) : stmts(stmtList) {}
+stmtlist::stmtlist(list<statement *> *stmtList) : stmts(stmtList) {}
 
-void pgm::evaluate() {
+void stmtlist::evaluate() {
 	list<statement *>::iterator stmtIter;
 	for (stmtIter = stmts->begin(); stmtIter != stmts->end();
 			stmtIter++) {
@@ -222,13 +222,25 @@ void pgm::evaluate() {
 	}
 }
 
-void pgm::print() {
+void stmtlist::print() {
 	list<statement *>::iterator stmtIter;
-        cout<<"\nGoing to print AST\n"; 
+        cout<<"\n[\n";
         for (stmtIter = stmts->begin(); stmtIter != stmts->end();
                         stmtIter++) {
-                (*stmtIter)->print();
+   				(*stmtIter)->print();
 	}
+        cout<<"] \n";
+}
+
+pgm::pgm(list<statement *> *stmtList) : stmts(new stmtlist(stmtList)) {}
+
+void pgm::evaluate() {
+	stmts->evaluate();
+}
+
+void pgm::print() {
+        cout<<"\nGoing to print AST\n"; 
+        stmts->print();
         cout<<"\nAST printed \n";
 }
 

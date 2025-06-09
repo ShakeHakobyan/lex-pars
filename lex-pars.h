@@ -128,13 +128,23 @@ public:
 	void evaluate();
 };
 
+
+class stmtlist : public statement {
+protected:
+	list<statement *> *stmts;
+public:
+	stmtlist(list<statement *> *stmtlist);
+	void evaluate();
+	void print();
+};
+
 class pgm {
-	protected:
-		list<statement *> *stmts;
-	public:
-		pgm(list<statement *> *stmtlist);
-		void evaluate();
-                void print();
+protected:
+	stmtlist *stmts;
+public:
+	pgm(list<statement *> *stmtlist);
+	void evaluate();
+	void print();
 };
 
 extern map<string, float> idTable;

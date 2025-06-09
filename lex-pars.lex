@@ -48,6 +48,10 @@ LETTER [a-zA-Z]
 
 ")"     { printf("<')' , RPAREN>\n"); return RPAREN; }
 
+"["     { printf("<'<' , LBRACKET>\n"); return LBRACKET; }
+
+"]"     { printf("<'>' , RBRACKET>\n"); return RBRACKET; }
+
 . { printf("error token: %s on line %d\n", yytext, line_num); yymore(); }
 
 %%

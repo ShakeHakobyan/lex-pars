@@ -44,6 +44,7 @@ void yyerror(char * s);
 %token DIVIDED
 %token <cmp> EQUALS 
 %token LPAREN RPAREN
+%token LBRACKET RBRACKET
 %token SEMICOLON
 
 %type <expnode> exp 
@@ -94,6 +95,9 @@ stmt: ID EQUALS exp SEMICOLON {
 
  | FOR LPAREN stmt stmt exp RPAREN stmt {
     $$= new for_stmt($3, $4, $5, $7);
+  }
+  | LBRACKET stmtlist RBRACKET {
+    $$ = new stmtlist($2);
   }
 
  | exp SEMICOLON {
