@@ -28,7 +28,7 @@ LETTER [a-zA-Z]
 
 {LETTER}[0-9a-zA-Z]* { printf("<id, ID>\n"); yylval.id = strdup(yytext); return ID; }
 
-[ \t\f\r]		 // ignore white space 
+[ \t\f\r]
 
 "\n"    { printf("<'\\n' , NEWLINE>\n"); line_num++; return NEWLINE; }
 
@@ -52,8 +52,12 @@ LETTER [a-zA-Z]
 
 "]"     { printf("<'>' , RBRACKET>\n"); return RBRACKET; }
 
+":)"    { printf("<':)' , GT_ZERO>\n"); return GT_ZERO; }
+
+":("    { printf("<':(' , LT_ZERO>\n"); return LT_ZERO; }
+
+":|"    { printf("<':|' , EQ_ZERO>\n"); return EQ_ZERO; }
+
 . { printf("error token: %s on line %d\n", yytext, line_num); yymore(); }
 
 %%
-
-

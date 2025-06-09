@@ -267,6 +267,72 @@ void if_else_stmt::codegen() {
   Builder.SetInsertPoint(MergeBB);
 }
 
+gt_zero_node::gt_zero_node(exp_node *e) : expr(e) {}
+
+void gt_zero_node::print() {
+  cout << "(>0 ";
+  expr->print();
+  cout << ")";
+}
+
+int gt_zero_node::evaluate() {
+  int val = expr->evaluate();
+  int result = val > 0 ? 1 : 0;
+  cout << "gt_zero_node: " << val << " > 0 = " << result << endl;
+  return result;
+}
+
+Value *gt_zero_node::codegen() {
+  Value *val = expr->codegen();
+  Value *zero = ConstantInt::get(Type::getInt32Ty(TheContext), 0, true);
+  Value *cond = Builder.CreateICmpSGT(val, zero, "gtzero");
+  return Builder.CreateZExt(cond, Type::getInt32Ty(TheContext), "boolToInt");
+}
+
+lt_zero_node::lt_zero_node(exp_node *e) : expr(e) {}
+
+void lt_zero_node::print() {
+  cout << "(<0 ";
+  expr->print();
+  cout << ")";
+}
+
+int lt_zero_node::evaluate() {
+  int val = expr->evaluate();
+  int result = val < 0 ? 1 : 0;
+  cout << "lt_zero_node: " << val << " < 0 = " << result << endl;
+  return result;
+}
+
+Value *lt_zero_node::codegen() {
+  Value *val = expr->codegen();
+  Value *zero = ConstantInt::get(Type::getInt32Ty(TheContext), 0, true);
+  Value *cond = Builder.CreateICmpSLT(val, zero, "ltzero");
+  return Builder.CreateZExt(cond, Type::getInt32Ty(TheContext), "boolToInt");
+}
+
+eq_zero_node::eq_zero_node(exp_node *e) : expr(e) {}
+
+void eq_zero_node::print() {
+  cout << "(=0 ";
+  expr->print();
+  cout << ")";
+}
+
+int eq_zero_node::evaluate() {
+  int val = expr->evaluate();
+  int result = val == 0 ? 1 : 0;
+  cout << "eq_zero_node: " << val << " == 0 = " << result << endl;
+  return result;
+}
+
+Value *eq_zero_node::codegen() {
+  Value *val = expr->codegen();
+  Value *zero = ConstantInt::get(Type::getInt32Ty(TheContext), 0, true);
+  Value *cond = Builder.CreateICmpEQ(val, zero, "eqzero");
+  return Builder.CreateZExt(cond, Type::getInt32Ty(TheContext), "boolToInt");
+}
+
 while_stmt::while_stmt(exp_node *expression, statement *statement)
     : exp(expression), stmt(statement) {}
 
