@@ -1,0 +1,8 @@
+./.idea
+lex-pars
+lex-pars.o
+lex.yy.c
+lex.yy.o
+y.tab.c
+y.tab.h
+y.tab.o
