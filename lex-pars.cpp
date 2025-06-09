@@ -188,6 +188,29 @@ void while_stmt::evaluate() {
 	cout << "while node" << endl << endl;
 }
 
+for_stmt::for_stmt(statement *initial, statement *step, exp_node *condition, statement *statement)
+	:  init(initial), step(step), cond(condition), stmt(statement) {}
+
+void for_stmt::print() {
+	cout << "for (\n    init: ";
+	init->print();
+	cout << "\n    step: ";
+	step->print();
+	cout << "\n    cond: ";
+	cond->print();
+	cout << ") \n";
+	stmt->print();
+}
+
+void for_stmt::evaluate() {
+	init->evaluate();
+	while(cond->evaluate()) {
+		stmt->evaluate();
+		step->evaluate();
+	}
+	cout << "for node" << endl << endl;
+}
+
 pgm::pgm(list<statement *> *stmtList) : stmts(stmtList) {}
 
 void pgm::evaluate() {

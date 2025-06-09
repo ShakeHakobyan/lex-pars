@@ -116,6 +116,18 @@ public:
 	void evaluate();
 };
 
+class for_stmt : public statement {
+protected:
+	statement *init;
+	statement *step;
+	exp_node *cond;
+	statement *stmt;
+public:
+	for_stmt(statement *initial, statement *step, exp_node *condition, statement *statement);
+	void print();
+	void evaluate();
+};
+
 class pgm {
 	protected:
 		list<statement *> *stmts;

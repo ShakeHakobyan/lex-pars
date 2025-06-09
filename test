@@ -7,3 +7,5 @@ if (1) print a;
 else print c;
 
 while(a) a = a - 1;
+
+for(i = 0; i=i+1; i - b) print i;

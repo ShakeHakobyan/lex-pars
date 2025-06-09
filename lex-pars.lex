@@ -20,6 +20,8 @@ LETTER [a-zA-Z]
 
 "while"  { printf("<'while' , keyword>"); return WHILE; }
 
+"for"  { printf("<'for' , keyword>"); return FOR; }
+
 "print"   { printf("<'print' , keyword>"); return PRINT; }
 
 {DIGIT}+  { printf("<num, NUMBER>\n"); yylval.num = atof(yytext); return NUMBER; }
