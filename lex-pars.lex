@@ -18,6 +18,8 @@ LETTER [a-zA-Z]
 
 "else"   { printf("<'else' , keyword>"); return ELSE; }
 
+"while"  { printf("<'while' , keyword>"); return WHILE; }
+
 "print"   { printf("<'print' , keyword>"); return PRINT; }
 
 {DIGIT}+  { printf("<num, NUMBER>\n"); yylval.num = atof(yytext); return NUMBER; }

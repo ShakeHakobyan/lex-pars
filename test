@@ -1,7 +1,9 @@
-a = 1;
+a = 5;
 a-2;
 b = 5;
 c = a * b;
 
 if (1) print a;
 else print c;
+
+while(a) a = a - 1;

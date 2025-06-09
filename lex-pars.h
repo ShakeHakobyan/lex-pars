@@ -106,6 +106,16 @@ public:
 	void evaluate();
 };
 
+class while_stmt : public statement {
+protected:
+	exp_node *exp;
+	statement *stmt;
+public:
+	while_stmt(exp_node *expression, statement *statement);
+	void print();
+	void evaluate();
+};
+
 class pgm {
 	protected:
 		list<statement *> *stmts;

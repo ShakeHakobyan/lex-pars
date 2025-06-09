@@ -99,7 +99,7 @@ float minus_node::evaluate(){
 	num = left_num - right_num;
 	cout<<"minus_node: "<<left_num<<"-"<<right_num<<"="<<num<<"\n";
 
-	return 0;
+	return num;
 }
 
 divided_node::divided_node(exp_node *L, exp_node *R) : operator_node(L, R) {
@@ -122,7 +122,7 @@ float divided_node::evaluate(){
 	num = left_num / right_num;
 	cout<<"divided_node: "<<left_num<<"/"<<right_num<<"="<<num<<"\n";
 
-	return 0;
+	return num;
 }
 
 assignment_stmt::assignment_stmt(string name, exp_node *expression)
@@ -169,6 +169,23 @@ void if_else_stmt::evaluate() {
 		stmt_false->evaluate();
     }
 	cout << "if else node" << endl << endl;
+}
+
+while_stmt::while_stmt(exp_node *expression, statement *statement)
+	:  exp(expression), stmt(statement) {}
+
+void while_stmt::print() {
+	cout << "while (";
+	exp->print();
+	cout << " )\n";
+	stmt->print();
+}
+
+void while_stmt::evaluate() {
+	while(exp->evaluate()) {
+		stmt->evaluate();
+	}
+	cout << "while node" << endl << endl;
 }
 
 pgm::pgm(list<statement *> *stmtList) : stmts(stmtList) {}

@@ -34,6 +34,7 @@ void yyerror(char * s);
 %token <id> ID
 %token <if> IF
 %token <else> ELSE
+%token <while> WHILE
 %token <print> PRINT
 %token NEWLINE
 %token PLUS
@@ -84,6 +85,10 @@ stmt: ID EQUALS exp SEMICOLON {
 
 | IF LPAREN exp RPAREN stmt ELSE  stmt {
    $$= new if_else_stmt($3, $5, $7);
+ }
+
+| WHILE LPAREN exp RPAREN stmt {
+   $$= new while_stmt($3, $5);
  }
 
  | exp SEMICOLON {
