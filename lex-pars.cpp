@@ -438,6 +438,108 @@ void for_stmt::codegen() {
   Builder.SetInsertPoint(AfterBB);
 }
 
+function_decl_stmt::function_decl_stmt(string funcName, list<char *> *paramsList,
+                                       list<statement *> *bodyList)
+    : name(funcName), params(paramsList), body(bodyList) {}
+
+void function_decl_stmt::print() {
+  cout << "function " << name << "(";
+  bool first = true;
+  for (auto p : *params) {
+    if (!first)
+      cout << ", ";
+    cout << p;
+    first = false;
+  }
+  cout << ") {\n";
+  for (auto stmt : *body) {
+    stmt->print();
+  }
+  cout << "}\n";
+}
+
+void function_decl_stmt::evaluate() {
+  cout << "Evaluating function declaration: " << name << endl;
+}
+
+void function_decl_stmt::codegen() {
+  vector<Type *> Integers(params->size(), Type::getInt32Ty(TheContext));
+  FunctionType *FT = FunctionType::get(Type::getVoidTy(TheContext), Integers, false);
+
+  Function *F = Function::Create(FT, Function::ExternalLinkage, name, TheModule.get());
+
+  auto argIter = F->arg_begin();
+  for (auto p : *params) {
+    argIter->setName(p);
+    ++argIter;
+  }
+
+  BasicBlock *BB = BasicBlock::Create(TheContext, "entry", F);
+  Builder.SetInsertPoint(BB);
+
+  NamedValues.clear();
+  argIter = F->arg_begin();
+  for (auto p : *params) {
+    AllocaInst *Alloca = Builder.CreateAlloca(Type::getInt32Ty(TheContext), 0, p);
+    Builder.CreateStore(&*argIter, Alloca);
+    NamedValues[string(p)] = Alloca;
+    ++argIter;
+  }
+
+  for (auto stmt : *body) {
+    stmt->codegen();
+  }
+
+  Builder.CreateRetVoid();
+
+  if (verifyFunction(*F, &errs())) {
+    errs() << "Function verification failed for: " << name << "\n";
+    F->eraseFromParent();
+  }
+}
+
+function_call_node::function_call_node(string funcName, list<char *> *argsList)
+    : name(funcName), args(argsList) {}
+
+void function_call_node::print() {
+  cout << name << "(";
+  bool first = true;
+  for (auto arg : *args) {
+    if (!first)
+      cout << ", ";
+    cout << arg;
+    first = false;
+  }
+  cout << ")";
+}
+
+int function_call_node::evaluate() {
+  cout << "Evaluating function call: " << name << endl;
+  return 0;
+}
+
+Value *function_call_node::codegen() {
+  Function *CalleeF = TheModule->getFunction(name);
+  if (!CalleeF) {
+    cerr << "Error: Unknown function referenced: " << name << "\n";
+    return nullptr;
+  }
+
+  if (CalleeF->arg_size() != args->size()) {
+    cerr << "Error: Incorrect # arguments passed to function " << name << "\n";
+    return nullptr;
+  }
+
+  vector<Value *> ArgsV;
+  for (char *argStr : *args) {
+    int argVal = atoi(argStr);
+    Value *val = ConstantInt::get(Type::getInt32Ty(TheContext), argVal, true);
+    ArgsV.push_back(val);
+  }
+
+  return Builder.CreateCall(CalleeF, ArgsV, "calltmp");
+}
+
 stmtlist::stmtlist(list<statement *> *stmtList) : stmts(stmtList) {}
 
 void stmtlist::evaluate() {
@@ -473,7 +575,7 @@ void pgm::print() {
 
 void pgm::codegen() {
 
-  FunctionType *FT = FunctionType::get(Type::getInt32Ty(TheContext), false);
+  FunctionType *FT = FunctionType::get(Type::getVoidTy(TheContext), false);
   Function *MainF =
       Function::Create(FT, Function::ExternalLinkage, "main", TheModule.get());
 
@@ -482,8 +584,7 @@ void pgm::codegen() {
 
   stmts->codegen();
 
-  Builder.CreateRet(ConstantInt::get(Type::getInt32Ty(TheContext), 0));
-
+  Builder.CreateRetVoid();
   error_code EC;
   raw_fd_ostream dest("output.ll", EC, sys::fs::OF_None);
   if (EC) {

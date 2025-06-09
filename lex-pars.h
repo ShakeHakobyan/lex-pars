@@ -91,6 +91,39 @@ public:
   Value *codegen() override;
 };
 
+class gt_zero_node : public exp_node {
+protected:
+  exp_node *expr;
+
+public:
+  gt_zero_node(exp_node *e);
+  void print() override;
+  int evaluate() override;
+  Value *codegen() override;
+};
+
+class lt_zero_node : public exp_node {
+protected:
+  exp_node *expr;
+
+public:
+  lt_zero_node(exp_node *e);
+  void print() override;
+  int evaluate() override;
+  Value *codegen() override;
+};
+
+class eq_zero_node : public exp_node {
+protected:
+  exp_node *expr;
+
+public:
+  eq_zero_node(exp_node *e);
+  void print() override;
+  int evaluate() override;
+  Value *codegen() override;
+};
+
 class statement {
 public:
   virtual void print() {}
@@ -135,39 +168,6 @@ public:
   void codegen() override;
 };
 
-class gt_zero_node : public exp_node {
-protected:
-  exp_node *expr;
-
-public:
-  gt_zero_node(exp_node *e);
-  void print() override;
-  int evaluate() override;
-  Value *codegen() override;
-};
-
-class lt_zero_node : public exp_node {
-protected:
-  exp_node *expr;
-
-public:
-  lt_zero_node(exp_node *e);
-  void print() override;
-  int evaluate() override;
-  Value *codegen() override;
-};
-
-class eq_zero_node : public exp_node {
-protected:
-  exp_node *expr;
-
-public:
-  eq_zero_node(exp_node *e);
-  void print() override;
-  int evaluate() override;
-  Value *codegen() override;
-};
-
 class while_stmt : public statement {
 protected:
   exp_node *exp;
@@ -193,6 +193,31 @@ public:
   void print() override;
   void evaluate() override;
   void codegen() override;
+};
+
+class function_decl_stmt : public statement {
+protected:
+  string name;
+  list<char *> *params;
+  list<statement *> *body;
+
+public:
+  function_decl_stmt(string name, list<char *> *params, list<statement *> *body);
+  void print() override;
+  void evaluate() override;
+  void codegen() override;
+};
+
+class function_call_node : public exp_node {
+protected:
+  string name;
+  list<char *> *args;
+
+public:
+  function_call_node(string name, list<char *> *args);
+  void print() override;
+  int evaluate() override;
+  Value *codegen() override;
 };
 
 class stmtlist : public statement {

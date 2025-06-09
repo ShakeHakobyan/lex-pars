@@ -24,6 +24,7 @@ void yyerror(char * s);
   exp_node *expnode;
   list<statement *> *stmts;
   statement *st;
+  list<char *> *idlist;
   pgm *prog;
 }
 
@@ -36,6 +37,7 @@ void yyerror(char * s);
 %token <while> WHILE
 %token <while> FOR
 %token <print> PRINT
+%token <fn> FN
 %token NEWLINE
 %token PLUS
 %token MINUS
@@ -45,11 +47,13 @@ void yyerror(char * s);
 %token GT_ZERO LT_ZERO EQ_ZERO
 %token LPAREN RPAREN
 %token LBRACKET RBRACKET
-%token SEMICOLON
+%token LANGLE RANGLE
+%token SEMICOLON COMMA
 
-%type <expnode> exp
+%type <expnode> exp funccall
 %type <stmts> stmtlist
-%type <st> stmt
+%type <st> stmt fundecl
+%type <idlist> params
 %type <prog> program
 
 %left PLUS MINUS
@@ -72,6 +76,10 @@ stmtlist:
       $$ = $1;
       $1->push_back($2);
     }
+  | stmtlist fundecl {
+        $$ = $1;
+        $1->push_back($2);
+      }
   | stmtlist error NEWLINE {
       $$ = $1;
       yyclearin;
@@ -109,6 +117,26 @@ stmt:
     }
 ;
 
+fundecl:
+    FN ID LANGLE params RANGLE LBRACKET stmtlist RBRACKET {
+      $$ = new function_decl_stmt($2, $4, $7);
+    }
+;
+
+params:
+    ID {
+      $$ = new list<char*>();
+      $$->push_back(strdup($1));
+    }
+  | params COMMA ID {
+      $$ = $1;
+      $$->push_back(strdup($3));
+    }
+  | /* empty */ {
+      $$ = new list<char*>();
+    }
+;
+
 exp:
     exp PLUS exp {
       $$ = new plus_node($1, $3);
@@ -140,6 +168,15 @@ exp:
   | exp EQ_ZERO {
       $$ = new eq_zero_node($1);
     }
+  | funccall {
+         $$ = $1;
+       }
+;
+
+funccall:
+    ID LANGLE params RANGLE {
+      $$ = new function_call_node($1, $3);
+    }
 ;
 
 %%
@@ -148,7 +185,7 @@ int main() {
   yyparse();
   root->evaluate();
   root->print();
-  root->codegen();
+  //root->codegen();
   return 0;
 }
 
